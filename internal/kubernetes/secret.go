@@ -19,7 +19,7 @@ func CreateSecretV2(clientset *kubernetes.Clientset, secret *v1.Secret) error {
 	if err != nil {
 		return err
 	}
-	log.Infof("Created Secret %s in Namespace %s\n", secret.Name, secret.Namespace)
+	log.Infof("created Secret %s in Namespace %s", secret.Name, secret.Namespace)
 	return nil
 }
 

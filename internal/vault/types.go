@@ -75,5 +75,5 @@ type VaultConfiguration struct {
 // VaultUnsealExecutionOptions
 type VaultUnsealExecutionOptions struct {
 	KubeInClusterConfig bool
-	Restart             bool
+	UnsealLeaderOnly    bool
 }

@@ -4,6 +4,9 @@ on:
     tags:
       - "*"
 
+permissions:
+  packages: write
+
 jobs:
   goreleaser:
     name: build and push Vault Handler

@@ -71,10 +71,8 @@ func (conf *VaultConfiguration) UnsealRaftLeader(clientset *kubernetes.Clientset
 		log.Infof("initializing vault raft leader")
 
 		initResponse, err := vaultClient.Sys().Init(&vaultapi.InitRequest{
-			RecoveryShares:    RecoveryShares,
-			RecoveryThreshold: RecoveryThreshold,
-			SecretShares:      SecretShares,
-			SecretThreshold:   SecretThreshold,
+			SecretShares:    SecretShares,
+			SecretThreshold: SecretThreshold,
 		})
 		if err != nil {
 			return err

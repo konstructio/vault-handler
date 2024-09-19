@@ -1,5 +1,8 @@
 version: 2
 
+release:
+  disable: true
+  
 builds:
   - env:
       - CGO_ENABLED=0

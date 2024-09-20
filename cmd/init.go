@@ -1,5 +1,8 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright (C) 2021-2024, Kubefirst
+
+This program is licensed under MIT.
+See the LICENSE file for more details.
 */
 package cmd
 
@@ -9,26 +12,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Initialize a vault instance",
-	Long:  `Initialize a vault instance`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
-	},
-}
+func getInitCommand() *cobra.Command {
+	// initCmd represents the init command
+	initCmd := &cobra.Command{
+		Use:   "init",
+		Short: "Initialize a vault instance",
+		Long:  `Initialize a vault instance`,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("init called")
+		},
+	}
 
-func init() {
-	rootCmd.AddCommand(initCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// initCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	return initCmd
 }

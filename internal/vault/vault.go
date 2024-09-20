@@ -4,15 +4,13 @@ import (
 	"strings"
 
 	vaultapi "github.com/hashicorp/vault/api"
-	kubernetesinternal "github.com/kubefirst/vault-handler/internal/kubernetes"
-	"k8s.io/client-go/kubernetes"
 )
 
 // parseExistingVaultInitSecret returns the value of a vault initialization secret if it exists
-func parseExistingVaultInitSecret(clientset *kubernetes.Clientset) (*vaultapi.InitResponse, error) {
+func (conf *Configuration) parseExistingVaultInitSecret() (*vaultapi.InitResponse, error) {
 	// If vault has already been initialized, the response is formatted to contain the value
 	// of the initialization secret
-	secret, err := kubernetesinternal.ReadSecretV2(clientset, VaultNamespace, VaultSecretName)
+	secret, err := conf.Kubernetes.ReadSecret(VaultSecretName, VaultNamespace)
 	if err != nil {
 		return &vaultapi.InitResponse{}, err
 	}

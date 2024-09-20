@@ -1,76 +1,67 @@
 package kubernetes
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/kubefirst/vault-handler/internal/common"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 )
 
-var fs afero.Fs = afero.NewOsFs()
-
-// CreateKubeConfig
-func CreateKubeConfig(inCluster bool) (*rest.Config, *kubernetes.Clientset, string) {
-	// inCluster is either true or false
-	// If it's true, we pull Kubernetes API authentication from Pod SA
-	// If it's false, we use local machine settings
-	if inCluster {
-		config, err := rest.InClusterConfig()
-		if err != nil {
-			panic(err.Error())
-		}
-
-		clientset, err := kubernetes.NewForConfig(config)
-		if err != nil {
-			panic(err.Error())
-		}
-
-		return config, clientset, "in-cluster"
-	}
-
-	// Set path to kubeconfig
-	kubeconfig := ReturnKubeConfigPath()
-
-	// Check to make sure kubeconfig actually exists
-	// If it doesn't, go fetch it
-	if common.FileExists(fs, kubeconfig) {
-		log.Debug("kubeconfig exists, moving on.")
-	}
-
-	// Show what path was set for kubeconfig
-	log.Debugf("setting kubeconfig to: %s", kubeconfig)
-
-	// Build configuration instance from the provided config file
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		log.Fatalf("unable to locate kubeconfig file - checked path: %s", kubeconfig)
-	}
-
-	// Create clientset, which is used to run operations against the API
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err)
-	}
-
-	return config, clientset, kubeconfig
+type Kubernetes struct {
+	clientset kubernetes.Interface
+	config    *rest.Config
+	inCluster bool
 }
 
-// ReturnKubeConfigPath generates the path in the filesystem to kubeconfig
-func ReturnKubeConfigPath() string {
-	var kubeconfig string
-	// We expect kubeconfig to be available at ~/.kube/config
-	// However, sometimes some people may use the env var $KUBECONFIG
-	// to set the path to the active one - we will switch on that here
-	if os.Getenv("KUBECONFIG") != "" {
-		kubeconfig = os.Getenv("KUBECONFIG")
+func New(inCluster bool) (*Kubernetes, error) {
+	kube := &Kubernetes{}
+	kube.inCluster = inCluster
+
+	var kubeconfigLocation string
+
+	if inCluster {
+		kubeconfigLocation = ""
 	} else {
-		kubeconfig = filepath.Join(homedir.HomeDir(), ".kube", "config")
+		kubeconfigLocation = remoteKubernetes()
+
+		if _, err := os.Stat(kubeconfigLocation); err != nil {
+			return nil, fmt.Errorf("error reading kubeconfig: %s", err)
+		}
 	}
-	return kubeconfig
+
+	// From the docs: If neither masterUrl or kubeconfigPath are passed in we
+	// fallback to inClusterConfig
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigLocation)
+	if err != nil {
+		return nil, fmt.Errorf("error building kubeconfig: %s", err)
+	}
+
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("error creating clientset: %s", err)
+	}
+
+	kube.clientset = clientset
+	kube.config = config
+
+	return kube, nil
+}
+
+func remoteKubernetes() string {
+	if loc := os.Getenv("KUBECONFIG"); loc != "" {
+		return loc
+	}
+	return filepath.Join(homedir.HomeDir(), ".kube", "config")
+}
+
+func (k *Kubernetes) GetClientSet() kubernetes.Interface {
+	return k.clientset
+}
+
+func (k *Kubernetes) GetConfig() *rest.Config {
+	return k.config
 }

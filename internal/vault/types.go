@@ -36,8 +36,7 @@ type RaftJoinRequest struct {
 	LeaderAPIAddress string `json:"leader_api_addr"`
 }
 
-type RaftJoinResponse struct {
-}
+type RaftJoinResponse struct{}
 
 // UnsealRequest specifies the content of an `unseal` operation against a vault API
 // https://developer.hashicorp.com/vault/api-docs/system/unseal#sample-payload
@@ -69,7 +68,7 @@ type VaultUnsealOptions struct {
 }
 
 type VaultConfiguration struct {
-	Config vaultapi.Config
+	Config *vaultapi.Config
 }
 
 // VaultUnsealExecutionOptions

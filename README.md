@@ -15,7 +15,7 @@ At this time, it only supports running Vault using Raft storage with either 1 or
 ## Usage
 
 ```bash
-❯ vault-handler unseal -h
+$ vault-handler unseal -h
 Unseal a vault instance
 
 Usage:

@@ -1,7 +1,7 @@
 package vault
 
-// VaultUnsealExecutionOptions
-type VaultUnsealExecutionOptions struct {
+// UnsealOptions
+type UnsealOptions struct {
 	KubeInClusterConfig bool
 	UnsealLeaderOnly    bool
 }

@@ -12,9 +12,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var vaultUnsealOpts *vault.VaultUnsealExecutionOptions = &vault.VaultUnsealExecutionOptions{}
-
 func getUnsealCommand() *cobra.Command {
+	var opts vault.UnsealOptions
+
 	unsealCmd := &cobra.Command{
 		Use:   "unseal",
 		Short: "Unseal a vault instance",
@@ -30,7 +30,7 @@ func getUnsealCommand() *cobra.Command {
 				return fmt.Errorf("error unsealing vault raft leader: %s", err)
 			}
 
-			if !vaultUnsealOpts.UnsealLeaderOnly {
+			if !opts.UnsealLeaderOnly {
 				if err := vault.UnsealRaftFollowers(); err != nil {
 					return fmt.Errorf("error unsealing vault raft followers: %s", err)
 				}
@@ -41,8 +41,8 @@ func getUnsealCommand() *cobra.Command {
 		},
 	}
 
-	unsealCmd.Flags().BoolVar(&vaultUnsealOpts.UnsealLeaderOnly, "leader-only", false, "unseal only the raft leader - false (default) - true to only init and unseal vault-0")
-	unsealCmd.Flags().BoolVar(&vaultUnsealOpts.KubeInClusterConfig, "use-kubeconfig-in-cluster", true, "kube config type - in-cluster (default), set to false to use local")
+	unsealCmd.Flags().BoolVar(&opts.UnsealLeaderOnly, "leader-only", false, "unseal only the raft leader - false (default) - true to only init and unseal vault-0")
+	unsealCmd.Flags().BoolVar(&opts.KubeInClusterConfig, "use-kubeconfig-in-cluster", true, "kube config type - in-cluster (default), set to false to use local")
 
 	return unsealCmd
 }

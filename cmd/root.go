@@ -13,7 +13,6 @@ func Run() error {
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	rootCmd.AddCommand(getInitCommand())
 	rootCmd.AddCommand(getUnsealCommand())
 
 	return rootCmd.Execute() //nolint:wrapcheck // it's our errors returned

@@ -21,18 +21,18 @@ func getUnsealCommand() *cobra.Command {
 		RunE: func(_ *cobra.Command, _ []string) error {
 			kube, err := kubernetes.New(true)
 			if err != nil {
-				return fmt.Errorf("error creating kubernetes client: %s", err)
+				return fmt.Errorf("error creating kubernetes client: %w", err)
 			}
 
 			vault := vault.New(kube)
 
 			if err := vault.UnsealRaftLeader(); err != nil {
-				return fmt.Errorf("error unsealing vault raft leader: %s", err)
+				return fmt.Errorf("error unsealing vault raft leader: %w", err)
 			}
 
 			if !opts.UnsealLeaderOnly {
 				if err := vault.UnsealRaftFollowers(); err != nil {
-					return fmt.Errorf("error unsealing vault raft followers: %s", err)
+					return fmt.Errorf("error unsealing vault raft followers: %w", err)
 				}
 			}
 

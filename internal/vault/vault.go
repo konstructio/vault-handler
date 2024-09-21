@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"fmt"
 	"strings"
 
 	vaultapi "github.com/hashicorp/vault/api"
@@ -12,7 +13,7 @@ func (conf *Configuration) parseExistingVaultInitSecret() (*vaultapi.InitRespons
 	// of the initialization secret
 	secret, err := conf.Kubernetes.ReadSecret(VaultSecretName, VaultNamespace)
 	if err != nil {
-		return &vaultapi.InitResponse{}, err
+		return nil, fmt.Errorf("error reading secret %q: %w", VaultSecretName, err)
 	}
 
 	// Add root-unseal-key entries to slice
@@ -23,9 +24,8 @@ func (conf *Configuration) parseExistingVaultInitSecret() (*vaultapi.InitRespons
 		}
 	}
 
-	existingInitResponse := &vaultapi.InitResponse{
+	return &vaultapi.InitResponse{
 		Keys:      rkSlice,
 		RootToken: secret["root-token"],
-	}
-	return existingInitResponse, nil
+	}, nil
 }

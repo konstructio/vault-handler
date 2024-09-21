@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"time"
 
 	vaultapi "github.com/hashicorp/vault/api"
@@ -18,7 +19,7 @@ func (conf *Configuration) getVaultClientForNode(node string) (*vaultapi.Client,
 	}
 
 	configCopy := conf.Config
-	configCopy.Address = fmt.Sprintf("http://%s:8200", pod.Status.PodIP)
+	configCopy.Address = "http://" + net.JoinHostPort(pod.Status.PodIP, "8200")
 	client, err := vaultapi.NewClient(configCopy)
 	if err != nil {
 		return nil, fmt.Errorf("error creating vault client: %w", err)
@@ -48,14 +49,14 @@ func unsealVault(client *vaultapi.Client, keys []string) error {
 			if err != nil {
 				if errors.Is(err, context.DeadlineExceeded) {
 					continue
-				} else {
-					cancel()
-					return fmt.Errorf("error unsealing shard %v: %w", i+1, err)
 				}
-			} else {
-				unsealed = true
-				break
+
+				cancel()
+				return fmt.Errorf("error unsealing shard %v: %w", i+1, err)
 			}
+
+			unsealed = true
+			break
 		}
 
 		cancel()

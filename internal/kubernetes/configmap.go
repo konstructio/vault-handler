@@ -16,7 +16,7 @@ func (k *Kubernetes) ReadConfigMap(name, namespace string) (map[string]string, e
 
 	parsedSecretData := make(map[string]string)
 	for key, value := range configMap.Data {
-		parsedSecretData[key] = string(value)
+		parsedSecretData[key] = value
 	}
 
 	return parsedSecretData, nil

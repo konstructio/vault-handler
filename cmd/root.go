@@ -16,5 +16,5 @@ func Run() error {
 	rootCmd.AddCommand(getInitCommand())
 	rootCmd.AddCommand(getUnsealCommand())
 
-	return rootCmd.Execute()
+	return rootCmd.Execute() //nolint:wrapcheck // it's our errors returned
 }

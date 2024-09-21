@@ -29,7 +29,7 @@ func New(inCluster bool) (*Kubernetes, error) {
 		kubeconfigLocation = remoteKubernetes()
 
 		if _, err := os.Stat(kubeconfigLocation); err != nil {
-			return nil, fmt.Errorf("error reading kubeconfig: %s", err)
+			return nil, fmt.Errorf("error reading kubeconfig: %w", err)
 		}
 	}
 
@@ -37,12 +37,12 @@ func New(inCluster bool) (*Kubernetes, error) {
 	// fallback to inClusterConfig
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigLocation)
 	if err != nil {
-		return nil, fmt.Errorf("error building kubeconfig: %s", err)
+		return nil, fmt.Errorf("error building kubeconfig: %w", err)
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, fmt.Errorf("error creating clientset: %s", err)
+		return nil, fmt.Errorf("error creating clientset: %w", err)
 	}
 
 	kube.clientset = clientset
@@ -58,6 +58,7 @@ func remoteKubernetes() string {
 	return filepath.Join(homedir.HomeDir(), ".kube", "config")
 }
 
+//nolint:ireturn // okay to return the Kubernetes interface
 func (k *Kubernetes) GetClientSet() kubernetes.Interface {
 	return k.clientset
 }

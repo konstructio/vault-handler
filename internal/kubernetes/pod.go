@@ -22,7 +22,7 @@ func (k *Kubernetes) GetPodWhenReady(ctx context.Context, timeoutSeconds int, ma
 	if err := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeout, true, func(ctx context.Context) (bool, error) {
 		pods, err := k.clientset.CoreV1().Pods(namespace).List(ctx, podListOptions)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("error listing pods: %w", err)
 		}
 
 		for _, pod := range pods.Items {

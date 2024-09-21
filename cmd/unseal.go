@@ -18,7 +18,7 @@ func getUnsealCommand() *cobra.Command {
 	unsealCmd := &cobra.Command{
 		Use:   "unseal",
 		Short: "Unseal a vault instance",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			kube, err := kubernetes.New(true)
 			if err != nil {
 				return fmt.Errorf("error creating kubernetes client: %s", err)

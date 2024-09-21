@@ -2,34 +2,31 @@ package kubernetes
 
 import (
 	"context"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
-// CreateSecretV2 creates a Kubernetes Secret
-func CreateSecretV2(clientset *kubernetes.Clientset, secret *v1.Secret) error {
-	_, err := clientset.CoreV1().Secrets(secret.Namespace).Create(
+func (k *Kubernetes) CreateSecret(secret *v1.Secret) error {
+	_, err := k.clientset.CoreV1().Secrets(secret.Namespace).Create(
 		context.Background(),
 		secret,
 		metav1.CreateOptions{},
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating secret: %w", err)
 	}
+
 	log.Infof("created Secret %s in Namespace %s", secret.Name, secret.Namespace)
 	return nil
 }
 
-// ReadSecretV2 reads the content of a Kubernetes Secret
-func ReadSecretV2(clientset *kubernetes.Clientset, namespace string, secretName string) (map[string]string, error) {
-
-	secret, err := clientset.CoreV1().Secrets(namespace).Get(context.Background(), secretName, metav1.GetOptions{})
+func (k *Kubernetes) ReadSecret(name, namespace string) (map[string]string, error) {
+	secret, err := k.clientset.CoreV1().Secrets(namespace).Get(context.Background(), name, metav1.GetOptions{})
 	if err != nil {
-		log.Errorf("Error getting secret: %s\n", err)
-		return map[string]string{}, nil
+		return nil, fmt.Errorf("error getting secret: %w", err)
 	}
 
 	parsedSecretData := make(map[string]string)
